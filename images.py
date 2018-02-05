@@ -11,8 +11,11 @@ auth.set_access_token(access_token, access_secret)
 
 api = tweepy.API(auth)
 
+
+handle = raw_input("Enter Twitter Handle: \n ")
+
 # tweets = api.search('landscape', count=200)
-tweets = api.user_timeline(screen_name='caseymac',count=200, include_rts=False,exclude_replies=True)
+tweets = api.user_timeline(screen_name=handle,count=200, include_rts=False,exclude_replies=True)
 media_files = set()
 for tweet in tweets :
     media = tweet.entities.get('media', [])

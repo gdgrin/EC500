@@ -6,15 +6,24 @@ import os
 
 import subprocess
 
-api_key = '07J6DTOfFNVvROefk2L4X3EPi'
-api_secret = 'y7zBiXCN8wSV8Uhn4wlYFjgxxFzRAasCpUEgD5jrx9QYFhnGgb'
-access_token = '4108052595-kCEtiUcDB2zeRqjn61wJqbsO1ZJ8jLwQRw7s1zR'
-access_secret = 'frHKcMR2mcy54NEHyv0eZ4yChoc4eB75ls4akvutoWp8O'
+# Imports the Google Cloud client library
+from google.cloud import vision
+from google.cloud.vision import types
+
+api_key = ''
+api_secret = ''
+access_token = ''
+access_secret = ''
 
 auth = tweepy.OAuthHandler(api_key,api_secret)
 auth.set_access_token(access_token, access_secret)
 
 api = tweepy.API(auth)
+
+directory = 'photos'
+
+if not os.path.exists(directory):
+    os.makedirs(directory)
 
 handle = raw_input("Enter Twitter Handle: \n ")
 
@@ -26,32 +35,37 @@ for tweet in tweets :
     if(len(media) > 0) :
         media_files.add(media[0]['media_url'])
 
+if(len(media_files) == 0):
+    print "No Images Found"
+    quit()
+
 for media_file in media_files :
     wget.download(media_file, out = 'photos')
 
-directory = 'photos'
 
+j=0
 def image_rename():
-    i=0
+    j=0
     directory = "photos"
     for filename in os.listdir(directory):
         if filename.endswith(".jpg"):
-            os.rename(directory + "/" + filename, directory + "/image" + str(i) + ".jpg")
-            i+=1
+            os.rename(directory + "/" + filename, directory + "/image" + str(j) + ".jpg")
+            j+=1
     return
-
+i=0
 image_rename()
 
-# Imports the Google Cloud client library
-from google.cloud import vision
-from google.cloud.vision import types
+def filecount(dir_name):
+     return len([f for f in os.listdir(dir_name) if os.path.isfile(f)])
+
+numFiles = filecount(os.getcwd())
 
 # Instantiates a client
 client = vision.ImageAnnotatorClient()
 
 # The name of the image file to annotate
-i=2
-while i < 10 :
+i=0
+while i < numFiles:
     file_name = os.path.join(
         os.path.dirname(__file__),
         'photos/image{}.jpg'.format(i))
@@ -73,6 +87,7 @@ while i < 10 :
         file.write("\n")
 
     i+=1
-
+i=0
+# create video
 fps = 1
-subprocess.call(["ffmpeg","-y","-r",str(fps),"-i", "photos/image%d.jpg","-vcodec","mpeg4", "-qscale","5", "-r", str(fps), "video.avi"])
+subprocess.call(["ffmpeg","-y","-r",str(fps),"-i", "photos/image%d.jpg","-vcodec","mpeg4", "-qscale","20", "-r", str(fps), "video.avi"])
